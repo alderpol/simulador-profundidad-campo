@@ -1,0 +1,20 @@
+{
+  "name": "DoF Studio — Profundidad de campo",
+  "short_name": "DoF Studio",
+  "description": "Calculadora visual de profundidad de campo para fotógrafos.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f6f3",
+  "theme_color": "#18221d",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

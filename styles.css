@@ -24,3 +24,17 @@ svg text{font-family:inherit}.drag-subject{cursor:grab}.drag-subject:active{curs
 @media(max-width:1050px){.layout{grid-template-columns:290px minmax(0,1fr)}.metrics-grid{grid-template-columns:1fr 1fr}.metric-card.featured{grid-column:span 2}.info-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.topbar{height:62px}.hero{display:block}.hero-badge{display:inline-block;margin-top:16px}.layout{display:flex;flex-direction:column}.controls-panel{position:static;width:100%}.content{width:100%}.metrics-grid{grid-template-columns:1fr 1fr}.metric-card.featured{grid-column:span 2}.visual-head{display:block}.legend{margin-top:10px}.chart-wrap svg{min-height:250px}.hero h1{font-size:34px}}
 @media(max-width:500px){.app-shell{padding-top:25px}.metrics-grid{grid-template-columns:1fr}.metric-card.featured{grid-column:auto}.metric-card{min-height:115px}.controls-panel,.visual-card{padding:16px}.two-cols{grid-template-columns:1fr 1fr}.hero h1{font-size:31px}.legend{gap:8px}.chart-tip{display:none}}
+
+.install-btn[hidden]{display:none}
+.install-btn{background:var(--accent);color:#102019;border-color:var(--accent);font-weight:800}
+.preset-label{font-size:9px;color:var(--muted)}
+.camera-presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.camera-presets button{border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:10px;padding:9px 8px;text-align:left;font-size:10px;font-weight:700;transition:.16s ease}
+.camera-presets button:hover,.camera-presets button.active{border-color:var(--accent-strong);transform:translateY(-1px)}
+.share-toast{position:absolute;right:12px;top:12px;z-index:3;background:var(--dark);color:var(--panel);padding:8px 11px;border-radius:10px;font-size:10px;opacity:0;transform:translateY(-5px);transition:.2s ease;pointer-events:none}
+.share-toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:500px){
+  .camera-presets{grid-template-columns:1fr 1fr}
+  .top-actions .ghost-btn{padding:7px 9px;font-size:10px}
+  .top-actions .install-btn{display:none!important}
+}

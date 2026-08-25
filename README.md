@@ -57,3 +57,23 @@ El círculo de confusión predeterminado para cada formato se calcula a partir d
 ## Nota
 
 El proyecto está pensado como herramienta de planificación fotográfica. Los resultados dependen del criterio de círculo de confusión y de las condiciones reales de visualización, impresión y óptica.
+
+
+## Versión 2 — mejoras
+
+- Presets rápidos para retrato, calle, paisaje, macro y fauna.
+- Configuraciones compartibles mediante URL.
+- Botón de compartir con Web Share API cuando está disponible y copia al portapapeles como alternativa.
+- PWA instalable mediante `manifest.webmanifest`.
+- Service Worker para uso offline después de la primera carga.
+- Icono propio SVG.
+- Estado de configuración recuperable desde una URL.
+- Preparado para publicación como sitio estático en GitHub Pages.
+
+### Publicar en GitHub Pages
+
+GitHub Pages puede publicar directamente archivos estáticos desde un repositorio. Para este proyecto, basta con subir los archivos a la raíz y configurar Pages para publicar la rama principal. La PWA debe servirse mediante HTTPS (GitHub Pages lo proporciona) para que las funciones de instalación/service worker funcionen correctamente.
+
+Documentación oficial:
+- https://docs.github.com/en/pages
+- https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site

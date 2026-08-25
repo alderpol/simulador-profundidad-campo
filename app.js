@@ -12,6 +12,8 @@
 
   const state = {
     unit: localStorage.getItem("dof-unit") || "metric",
+    lensPreset: null,
+    loadedFromUrl: false,
     sensor: "fullframe",
     focal: 50,
     aperture: 2.8,
@@ -37,6 +39,67 @@
     if (v >= 100) return `${fmt(v, 1)} ${unit}`;
     return `${fmt(v, 2)} ${unit}`;
   }
+
+
+  const cameraPresets = {
+    portrait: { sensor:"fullframe", focal:85, aperture:1.8, distanceM:2.4 },
+    street: { sensor:"fullframe", focal:35, aperture:4, distanceM:5 },
+    landscape: { sensor:"fullframe", focal:24, aperture:8, distanceM:8 },
+    macro: { sensor:"fullframe", focal:100, aperture:8, distanceM:0.55 },
+    wildlife: { sensor:"fullframe", focal:400, aperture:5.6, distanceM:25 }
+  };
+
+  function encodeState() {
+    const p = new URLSearchParams({
+      s: state.sensor, f: state.focal, a: state.aperture,
+      d: state.distanceM, c: state.coc, u: state.unit,
+      w: state.sensorW, h: state.sensorH
+    });
+    return `${location.origin}${location.pathname}?${p.toString()}`;
+  }
+
+  function loadStateFromUrl() {
+    const p = new URLSearchParams(location.search);
+    if (!p.has("f") && !p.has("a") && !p.has("d")) return;
+    const n = (key, fallback) => {
+      const v = Number(p.get(key));
+      return Number.isFinite(v) ? v : fallback;
+    };
+    state.sensor = p.get("s") || state.sensor;
+    state.focal = n("f", state.focal);
+    state.aperture = n("a", state.aperture);
+    state.distanceM = n("d", state.distanceM);
+    state.coc = n("c", state.coc);
+    state.sensorW = n("w", state.sensorW);
+    state.sensorH = n("h", state.sensorH);
+    state.unit = p.get("u") === "imperial" ? "imperial" : "metric";
+    state.loadedFromUrl = true;
+  }
+
+  function applyCameraPreset(name) {
+    const p = cameraPresets[name];
+    if (!p) return;
+    state.sensor = p.sensor;
+    state.focal = p.focal;
+    state.aperture = p.aperture;
+    state.distanceM = p.distanceM;
+    const sensor = presets[state.sensor];
+    state.sensorW = sensor.w; state.sensorH = sensor.h;
+    state.coc = sensor.coc ?? Math.sqrt(sensor.w*sensor.w + sensor.h*sensor.h) / 1500;
+    $("sensorPreset").value = state.sensor;
+    state.lensPreset = name;
+    document.querySelectorAll("[data-preset]").forEach(b => b.classList.toggle("active", b.dataset.preset === name));
+    updateUI();
+  }
+
+  function showToast(message) {
+    const el = $("shareToast");
+    el.textContent = message;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 1800);
+  }
+
+  let deferredInstallPrompt = null;
 
   function calculate() {
     const f = state.focal;           // mm
@@ -175,9 +238,62 @@
   document.querySelectorAll(".unit-btn").forEach(b => b.addEventListener("click", () => { state.unit=b.dataset.unit; localStorage.setItem("dof-unit",state.unit); updateUI(); }));
   document.querySelectorAll("[data-distance]").forEach(b => b.addEventListener("click", () => { state.distanceM=+b.dataset.distance; updateUI(); }));
   $("hyperfocalBtn").addEventListener("click", () => { state.distanceM=Math.min(1000,calculate().H); updateUI(); });
-  $("resetBtn").addEventListener("click", () => { Object.assign(state,{sensor:"fullframe",focal:50,aperture:2.8,distanceM:3,sensorW:36,sensorH:24,coc:.029}); $("sensorPreset").value="fullframe"; updateUI(); });
+  $("resetBtn").addEventListener("click", () => {
+    Object.assign(state,{sensor:"fullframe",focal:50,aperture:2.8,distanceM:3,sensorW:36,sensorH:24,coc:.029,lensPreset:null});
+    $("sensorPreset").value="fullframe";
+    document.querySelectorAll("[data-preset]").forEach(b => b.classList.remove("active"));
+    history.replaceState(null,"",location.pathname);
+    updateUI();
+  });
+
+  document.querySelectorAll("[data-preset]").forEach(b =>
+    b.addEventListener("click", () => applyCameraPreset(b.dataset.preset))
+  );
+
+  $("shareBtn").addEventListener("click", async () => {
+    const url = encodeState();
+    history.replaceState(null, "", url);
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "DoF Studio", text: "Configuración de profundidad de campo", url });
+        return;
+      } catch (_) {}
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("Configuración copiada al portapapeles");
+    } catch (_) {
+      window.prompt("Copia esta configuración:", url);
+    }
+  });
+
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    $("installBtn").hidden = false;
+  });
+
+  $("installBtn").addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    $("installBtn").hidden = true;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    $("installBtn").hidden = true;
+    showToast("DoF Studio instalado");
+  });
+
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+
   $("themeBtn").addEventListener("click", () => document.body.classList.toggle("dark"));
 
+  loadStateFromUrl();
   $("sensorPreset").value = state.sensor;
+  $("sensorW").disabled = state.sensor !== "custom";
   updateUI();
 })();

@@ -6,6 +6,11 @@
   <meta name="description" content="Calculadora y simulador visual de profundidad de campo para fotógrafos.">
   <title>DoF Studio — Simulador de profundidad de campo</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#18221d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DoF Studio">
 </head>
 <body>
   <header class="topbar">
@@ -17,6 +22,8 @@
       </div>
     </div>
     <div class="top-actions">
+      <button id="installBtn" class="ghost-btn install-btn" type="button" hidden>Instalar</button>
+      <button id="shareBtn" class="ghost-btn" type="button">Compartir</button>
       <button id="resetBtn" class="ghost-btn" type="button">Restablecer</button>
       <button id="themeBtn" class="icon-btn" type="button" aria-label="Cambiar tema">☼</button>
     </div>
@@ -65,6 +72,20 @@
             <input id="coc" type="number" min="0.001" step="0.001">
           </label>
           <p class="hint">Por defecto: diagonal del sensor ÷ 1500. Puedes sobrescribirlo para un criterio de nitidez más exigente.</p>
+        </div>
+
+        <div class="control-section">
+          <div class="section-head">
+            <h3>Presets rápidos</h3>
+            <span class="preset-label">cámara + objetivo</span>
+          </div>
+          <div class="camera-presets">
+            <button type="button" data-preset="portrait">Retrato · 85 mm</button>
+            <button type="button" data-preset="street">Calle · 35 mm</button>
+            <button type="button" data-preset="landscape">Paisaje · 24 mm</button>
+            <button type="button" data-preset="macro">Macro · 100 mm</button>
+            <button type="button" data-preset="wildlife">Fauna · 400 mm</button>
+          </div>
         </div>
 
         <div class="control-section">
@@ -146,7 +167,7 @@
           </div>
           <div class="chart-wrap">
             <svg id="dofChart" viewBox="0 0 1000 430" role="img" aria-label="Diagrama de profundidad de campo"></svg>
-            <div class="chart-tip" id="chartTip">Arrastra el sujeto para cambiar la distancia de enfoque</div>
+            <div class="chart-tip" id="chartTip">Arrastra el sujeto para cambiar la distancia de enfoque</div><div class="share-toast" id="shareToast" aria-live="polite"></div>
           </div>
           <div class="chart-footer">
             <div><strong id="frontValue">—</strong><span>por delante</span></div>
