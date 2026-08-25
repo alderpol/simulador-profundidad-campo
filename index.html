@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Calculadora y simulador visual de profundidad de campo para fotógrafos.">
+  <title>DoF Studio — Simulador de profundidad de campo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">◉</div>
+      <div>
+        <strong>DoF Studio</strong>
+        <span>Profundidad de campo</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="resetBtn" class="ghost-btn" type="button">Restablecer</button>
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Cambiar tema">☼</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">CALCULADORA FOTOGRÁFICA</p>
+        <h1>Visualiza qué parte de tu escena estará enfocada.</h1>
+        <p class="hero-copy">Ajusta cámara, objetivo y distancia. Los resultados y el diagrama se actualizan al instante.</p>
+      </div>
+      <div class="hero-badge"><span class="live-dot"></span> Cálculo local en tu navegador</div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel controls-panel">
+        <div class="panel-title">
+          <div>
+            <span class="section-kicker">01</span>
+            <h2>Configuración</h2>
+          </div>
+          <div class="unit-toggle" role="group" aria-label="Unidades">
+            <button class="unit-btn active" data-unit="metric" type="button">m</button>
+            <button class="unit-btn" data-unit="imperial" type="button">ft</button>
+          </div>
+        </div>
+
+        <div class="control-section">
+          <h3>Cámara / sensor</h3>
+          <label>Formato
+            <select id="sensorPreset">
+              <option value="fullframe">Full Frame · 36 × 24 mm</option>
+              <option value="apsc">APS-C · 23.5 × 15.6 mm</option>
+              <option value="m43">Micro 4/3 · 17.3 × 13 mm</option>
+              <option value="medium">Medio formato · 44 × 33 mm</option>
+              <option value="oneinch">1″ · 13.2 × 8.8 mm</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </label>
+          <div class="two-cols">
+            <label>Ancho <span>mm</span><input id="sensorW" type="number" min="1" step="0.1"></label>
+            <label>Alto <span>mm</span><input id="sensorH" type="number" min="1" step="0.1"></label>
+          </div>
+          <label>Círculo de confusión <span>mm</span>
+            <input id="coc" type="number" min="0.001" step="0.001">
+          </label>
+          <p class="hint">Por defecto: diagonal del sensor ÷ 1500. Puedes sobrescribirlo para un criterio de nitidez más exigente.</p>
+        </div>
+
+        <div class="control-section">
+          <h3>Objetivo</h3>
+          <label>Distancia focal <span>mm</span>
+            <div class="range-row">
+              <input id="focal" type="range" min="10" max="600" step="1">
+              <output id="focalOut"></output>
+            </div>
+          </label>
+          <label>Apertura <span>f/</span>
+            <div class="range-row">
+              <input id="aperture" type="range" min="1" max="32" step="0.1">
+              <output id="apertureOut"></output>
+            </div>
+          </label>
+        </div>
+
+        <div class="control-section">
+          <div class="section-head">
+            <h3>Enfoque</h3>
+            <button id="hyperfocalBtn" class="mini-btn" type="button">Usar hiperfocal</button>
+          </div>
+          <label>Distancia al sujeto <span id="distanceUnit">m</span>
+            <div class="range-row">
+              <input id="distance" type="range" min="0.15" max="1000" step="0.01">
+              <output id="distanceOut"></output>
+            </div>
+          </label>
+          <div class="preset-distances">
+            <button type="button" data-distance="0.8">Retrato</button>
+            <button type="button" data-distance="3">Persona</button>
+            <button type="button" data-distance="10">Grupo</button>
+            <button type="button" data-distance="50">Paisaje</button>
+          </div>
+        </div>
+
+        <div class="formula-note">
+          <span>ƒ</span>
+          <div><strong>Modelo óptico</strong><br>H = f²/(N·c) + f · límites de DoF con distancia de enfoque.</div>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="metrics-grid">
+          <article class="metric-card featured">
+            <span>PROFUNDIDAD DE CAMPO</span>
+            <strong id="dofValue">—</strong>
+            <small id="dofSplit">—</small>
+          </article>
+          <article class="metric-card">
+            <span>LÍMITE CERCANO</span>
+            <strong id="nearValue">—</strong>
+            <small>punto más próximo aceptablemente nítido</small>
+          </article>
+          <article class="metric-card">
+            <span>LÍMITE LEJANO</span>
+            <strong id="farValue">—</strong>
+            <small id="farNote">punto más lejano aceptablemente nítido</small>
+          </article>
+          <article class="metric-card">
+            <span>HIPERFOCAL</span>
+            <strong id="hyperValue">—</strong>
+            <small>desde aquí hasta infinito queda dentro del rango</small>
+          </article>
+        </div>
+
+        <div class="visual-card">
+          <div class="visual-head">
+            <div>
+              <span class="section-kicker">02</span>
+              <h2>Mapa de enfoque</h2>
+            </div>
+            <div class="legend">
+              <span><i class="dot focus"></i>Zona enfocada</span>
+              <span><i class="dot subject"></i>Sujeto</span>
+              <span><i class="dot bg"></i>Fondo</span>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <svg id="dofChart" viewBox="0 0 1000 430" role="img" aria-label="Diagrama de profundidad de campo"></svg>
+            <div class="chart-tip" id="chartTip">Arrastra el sujeto para cambiar la distancia de enfoque</div>
+          </div>
+          <div class="chart-footer">
+            <div><strong id="frontValue">—</strong><span>por delante</span></div>
+            <div class="center-readout"><span>Enfoque</span><strong id="focusReadout">—</strong></div>
+            <div><strong id="behindValue">—</strong><span>por detrás</span></div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <article class="info-card">
+            <span class="info-icon">◎</span>
+            <div><h3>Círculo de confusión</h3><p id="cocInfo">—</p></div>
+          </article>
+          <article class="info-card">
+            <span class="info-icon">↔</span>
+            <div><h3>Distribución de la DoF</h3><p id="ratioInfo">—</p></div>
+          </article>
+          <article class="info-card">
+            <span class="info-icon">∞</span>
+            <div><h3>Consejo de enfoque</h3><p id="tipInfo">—</p></div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>DoF Studio · Calculadora educativa para planificación fotográfica · Todos los cálculos se realizan localmente.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
